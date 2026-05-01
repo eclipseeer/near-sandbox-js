@@ -2,33 +2,51 @@
   "name": "near-sandbox",
   "version": "0.2.6",
   "description": "CLI tool for testing NEAR smart contracts",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/near/near-sandbox-js.git"
   },
-  "bin": {
-    "near-sandbox": "./run.js",
-    "sandbox": "./run.js"
-  },
-  "repository": "https://github.com/near/sandbox",
   "author": "Near Inc (team@near.org)",
   "license": "MIT",
   "private": false,
+  "type": "commonjs",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.mjs",
+  "types": "dist/esm/index.d.mts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.mts",
+        "default": "./dist/esm/index.mjs"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.cts",
+        "default": "./dist/cjs/index.cjs"
+      }
+    }
+  },
+  "bin": {
+    "near-sandbox": "./dist/cjs/run.cjs",
+    "sandbox": "./dist/cjs/run.cjs"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "DEFAULT_FINALITY=optimistic ava",
+    "lint:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "release-check": "node scripts/release-check/run.mjs",
+    "changeset": "changeset",
+    "release": "changeset publish"
+  },
   "dependencies": {
-    "@near-js/tokens": "^2.2.2",
     "got": "^11.8.6",
     "json-merge-patch": "^1.0.2",
     "proper-lockfile": "^4.1.2",
-    "tar": "^6.2.0",
+    "tar": "7.5.13",
     "tmp-promise": "^3.0.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.13",
     "@changesets/changelog-github": "0.4.6",
     "@changesets/cli": "2.24.4",
     "@commitlint/cli": "17.0.3",
@@ -37,23 +55,17 @@
     "@near-js/crypto": "^2.2.2",
     "@near-js/providers": "2.2.5",
     "@near-js/signers": "2.2.5",
+    "@near-js/tokens": "^2.5.1",
     "@sindresorhus/tsconfig": "^2.0.0",
     "@types/json-merge-patch": "^1.0.0",
     "@types/node": "20.0.0",
     "@types/proper-lockfile": "^4.1.4",
-    "@types/tar": "^4.0.5",
     "ava": "6.2.0",
     "near-hello": "0.5.1",
     "ts-node": "^10.1.0",
-    "tsup": "^8.5.1",
+    "tsdown": "^0.21.10",
     "tsx": "^4.20.6",
     "typescript": "5.4.5"
-  },
-  "scripts": {
-    "test": "DEFAULT_FINALITY=optimistic ava",
-    "build": "tsup",
-    "changeset": "changeset",
-    "release": "changeset publish"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -1,12 +1,16 @@
-import test from "ava";
-import { join } from "path";
-import { DEFAULT_NEAR_SANDBOX_VERSION, Sandbox } from "../src/sandbox/Sandbox";
-import { TypedError } from "../src/errors";
+import test from 'ava';
+import { join } from 'path';
+import { TypedError } from '../src/errors';
+import { DEFAULT_NEAR_SANDBOX_VERSION, Sandbox } from '../src/sandbox/Sandbox';
 
-const TEST_BIN_DIR = join(__dirname, "..", "test_files");
-const TEST_BIN_PATH = join(TEST_BIN_DIR, `near-sandbox-${DEFAULT_NEAR_SANDBOX_VERSION}`, "near-sandbox");
+const TEST_BIN_DIR = join(__dirname, '..', 'test_files');
+const TEST_BIN_PATH = join(
+  TEST_BIN_DIR,
+  `near-sandbox-${DEFAULT_NEAR_SANDBOX_VERSION}`,
+  'near-sandbox',
+);
 
-test.before("can use local file", async (t) => {
+test.before('can use local file', async (t) => {
   process.env['DIR_TO_DOWNLOAD_BINARY'] = TEST_BIN_DIR;
   const sandbox = await Sandbox.start({});
   try {
@@ -23,16 +27,13 @@ test.before("can use local file", async (t) => {
   }
 });
 
-test("fails to start sandbox if local binary path does not exist", async (t) => {
-  process.env['NEAR_SANDBOX_BIN_PATH'] = "Not-existing-path";
+test('fails to start sandbox if local binary path does not exist', async (t) => {
+  process.env['NEAR_SANDBOX_BIN_PATH'] = 'Not-existing-path';
 
-  await t.throwsAsync(
-    () => Sandbox.start({}),
-    {
-      instanceOf: TypedError,
-      message: /NEAR_SANDBOX_BIN_PATH does not exist\./,
-    }
-  );
+  await t.throwsAsync(() => Sandbox.start({}), {
+    instanceOf: TypedError,
+    message: /NEAR_SANDBOX_BIN_PATH does not exist\./,
+  });
   process.env['NEAR_SANDBOX_BIN_PATH'] = TEST_BIN_PATH;
   const sandbox = await Sandbox.start({});
   try {

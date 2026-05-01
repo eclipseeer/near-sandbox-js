@@ -4,7 +4,5 @@ module.exports = {
   extensions: {
     ts: 'commonjs',
   },
-  require: [
-    'ts-node/register',
-  ],
+  require: ['ts-node/register'],
 };

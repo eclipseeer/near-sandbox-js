@@ -5,7 +5,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "module": "commonjs",
-		"target": "ES2022", // Node.js 20
+    "target": "ES2022",
     "skipLibCheck": true,
     "types": ["node"]
   },

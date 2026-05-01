@@ -6,3 +6,5 @@ test_files/
 .vscode/
 bin/
 dist/
+.idea
+.claude
