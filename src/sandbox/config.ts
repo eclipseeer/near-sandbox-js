@@ -1,11 +1,10 @@
-import { NEAR } from "@near-js/tokens";
 import { join } from "path";
 import { apply } from "json-merge-patch"
 import * as fs from "fs/promises";
 import { SandboxErrors, TypedError } from "../errors";
 
 /*
-  * Network specific configurations used to modify behavior inside a chain.
+  * Network-specific configurations used to modify behavior inside a chain.
   * This is so far only useable with sandbox networks since it would require
   * direct access to a node to change the config. Each network like mainnet
   * and testnet already have pre-configured settings; meanwhile sandbox can
@@ -16,7 +15,10 @@ import { SandboxErrors, TypedError } from "../errors";
 export const DEFAULT_ACCOUNT_ID = 'sandbox';
 export const DEFAULT_PUBLIC_KEY = 'ed25519:5BGSaf6YjVm7565VzWQHNxoyEjwr3jUpRJSGjREvU9dB';
 export const DEFAULT_PRIVATE_KEY = 'ed25519:3tgdk2wPraJzT4nsTuf86UX41xgPNk3MHnq8epARMdBNs29AFEztAuaQ7iHddDfXG9F2RzV1XNQYgJyAyoW51UBB';
-export const DEFAULT_BALANCE = NEAR.toUnits(10000);
+/**
+ * 10,000 NEAR
+ */
+export const DEFAULT_BALANCE = 10000000000000000000000000000n;
 
 /*
   * Represents a genesis account in the NEAR sandbox.

@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-module.exports = require("./dist/run");
+module.exports = require("./dist/cjs/run");

@@ -1,5 +1,5 @@
 export {
-    SandboxConfig,
+    type SandboxConfig,
     GenesisAccount,
     DEFAULT_ACCOUNT_ID,
     DEFAULT_PUBLIC_KEY,

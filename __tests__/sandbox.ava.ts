@@ -1,8 +1,7 @@
 import test from 'ava';
 import * as net from 'net';
 import { existsSync } from "fs";
-import { Sandbox } from '../src/sandbox/Sandbox';
-import { GenesisAccount, SandboxConfig } from '../src/sandbox/config';
+import { GenesisAccount, type SandboxConfig, Sandbox } from '../src';
 import { join } from 'path';
 import got from 'got';
 import { KeyPair } from '@near-js/crypto';
