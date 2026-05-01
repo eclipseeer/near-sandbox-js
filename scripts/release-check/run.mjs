@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { copyFile, mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -57,12 +57,17 @@ async function setupConsumer(format, tarballPath) {
   return { dir, fixtureFile };
 }
 
-async function runConsumer({ dir, fixtureFile }, cacheDir) {
+async function runConsumer({ dir, fixtureFile }, { fresh }) {
+  if (fresh) {
+    // Wipe the binary cache that lives inside the installed package.
+    // We deliberately do NOT set DIR_TO_DOWNLOAD_BINARY, so the production
+    // codepath (`join(__dirname, "..", "..", "bin")`) is exercised — this
+    // is what catches a missing ESM `__dirname` shim.
+    const binDir = join(dir, 'node_modules', 'near-sandbox', 'bin');
+    await rm(binDir, { recursive: true, force: true });
+  }
   const t0 = Date.now();
-  await run('node', [fixtureFile], {
-    cwd: dir,
-    env: { ...process.env, DIR_TO_DOWNLOAD_BINARY: cacheDir },
-  });
+  await run('node', [fixtureFile], { cwd: dir });
   return ((Date.now() - t0) / 1000).toFixed(1);
 }
 
@@ -90,8 +95,6 @@ async function main() {
     console.log(`  → ${tarballPath}`);
 
     step('5/5  Consumer tests');
-    const cacheDir = await mkdtemp(join(tmpdir(), 'near-sandbox-cache-'));
-    cleanupDirs.push(cacheDir);
 
     for (const format of ['cjs', 'esm']) {
       console.log(`\n  · setup ${format} consumer`);
@@ -99,13 +102,11 @@ async function main() {
       cleanupDirs.push(consumer.dir);
 
       console.log(`  · ${format}: fresh run (clean cache)`);
-      await rm(cacheDir, { recursive: true, force: true });
-      await mkdir(cacheDir, { recursive: true });
-      const freshTime = await runConsumer(consumer, cacheDir);
+      const freshTime = await runConsumer(consumer, { fresh: true });
       results.push({ step: `${format} fresh`, time: freshTime });
 
       console.log(`  · ${format}: cached run`);
-      const cachedTime = await runConsumer(consumer, cacheDir);
+      const cachedTime = await runConsumer(consumer, { fresh: false });
       results.push({ step: `${format} cached`, time: cachedTime });
     }
   } finally {
