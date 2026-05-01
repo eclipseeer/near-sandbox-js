@@ -1,5 +1,6 @@
+#!/usr/bin/env node
 import { spawnWithArgsAndVersion } from "./binary/binaryExecution";
-import { DEFAULT_NEAR_SANDBOX_VERSION } from "./sandbox/Sandbox";
+import { DEFAULT_NEAR_SANDBOX_VERSION } from './constants';
 
 async function run() {
     try {
