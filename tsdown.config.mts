@@ -12,4 +12,3 @@ export default defineConfig([
   { ...shared, format: 'cjs', outDir: 'dist/cjs' },
   { ...shared, format: 'esm', outDir: 'dist/esm', shims: true },
 ]);
-

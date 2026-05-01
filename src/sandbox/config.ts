@@ -1,33 +1,34 @@
-import { join } from "path";
-import { apply } from "json-merge-patch"
-import * as fs from "fs/promises";
-import { SandboxErrors, TypedError } from "../errors";
+import * as fs from 'fs/promises';
+import { apply } from 'json-merge-patch';
+import { join } from 'path';
+import { SandboxErrors, TypedError } from '../errors';
 
 /*
-  * Network-specific configurations used to modify behavior inside a chain.
-  * This is so far only useable with sandbox networks since it would require
-  * direct access to a node to change the config. Each network like mainnet
-  * and testnet already have pre-configured settings; meanwhile sandbox can
-  * have additional settings on top of them to facilitate custom behavior
-  * such as sending large requests to the sandbox network.
-  */
+ * Network-specific configurations used to modify behavior inside a chain.
+ * This is so far only useable with sandbox networks since it would require
+ * direct access to a node to change the config. Each network like mainnet
+ * and testnet already have pre-configured settings; meanwhile sandbox can
+ * have additional settings on top of them to facilitate custom behavior
+ * such as sending large requests to the sandbox network.
+ */
 
 export const DEFAULT_ACCOUNT_ID = 'sandbox';
 export const DEFAULT_PUBLIC_KEY = 'ed25519:5BGSaf6YjVm7565VzWQHNxoyEjwr3jUpRJSGjREvU9dB';
-export const DEFAULT_PRIVATE_KEY = 'ed25519:3tgdk2wPraJzT4nsTuf86UX41xgPNk3MHnq8epARMdBNs29AFEztAuaQ7iHddDfXG9F2RzV1XNQYgJyAyoW51UBB';
+export const DEFAULT_PRIVATE_KEY =
+  'ed25519:3tgdk2wPraJzT4nsTuf86UX41xgPNk3MHnq8epARMdBNs29AFEztAuaQ7iHddDfXG9F2RzV1XNQYgJyAyoW51UBB';
 /**
  * 10,000 NEAR
  */
 export const DEFAULT_BALANCE = 10000000000000000000000000000n;
 
 /*
-  * Represents a genesis account in the NEAR sandbox.
-  * Means it will saved as starting account in the genesis.json file.
-  * accountId - The unique identifier for the account, it`s can be top-level account or sub-account.(e.g. "alice.near", "alice")
-  * publicKey - The public part of the privateKey that will control the account.
-  * privateKey - The private key used to sign transactions for the account.
-  * balance - The initial balance of the account in yoctoNEAR.
-  */
+ * Represents a genesis account in the NEAR sandbox.
+ * Means it will saved as starting account in the genesis.json file.
+ * accountId - The unique identifier for the account, it`s can be top-level account or sub-account.(e.g. "alice.near", "alice")
+ * publicKey - The public part of the privateKey that will control the account.
+ * privateKey - The private key used to sign transactions for the account.
+ * balance - The initial balance of the account in yoctoNEAR.
+ */
 export class GenesisAccount {
   accountId: string;
   publicKey: string;
@@ -53,7 +54,7 @@ export class GenesisAccount {
       accountId ?? DEFAULT_ACCOUNT_ID,
       DEFAULT_PUBLIC_KEY,
       DEFAULT_PRIVATE_KEY,
-      DEFAULT_BALANCE
+      DEFAULT_BALANCE,
     );
   }
 }
@@ -84,22 +85,27 @@ export async function overrideConfigs(homeDir: string, config?: SandboxConfig): 
 
   await setSandboxConfig(homeDir, config);
   if (config?.nodeKey) {
-    await fs.writeFile(join(homeDir, "node_key.json"), JSON.stringify(config.nodeKey, null, 2), 'utf-8');
+    await fs.writeFile(
+      join(homeDir, 'node_key.json'),
+      JSON.stringify(config.nodeKey, null, 2),
+      'utf-8',
+    );
   }
   if (config?.validatorKey) {
-    await fs.writeFile(join(homeDir, 'validator_key.json'), JSON.stringify(config.validatorKey, null, 2), 'utf-8');
+    await fs.writeFile(
+      join(homeDir, 'validator_key.json'),
+      JSON.stringify(config.validatorKey, null, 2),
+      'utf-8',
+    );
   }
 }
-export async function setSandboxGenesis(
-  homeDir: string,
-  config?: SandboxConfig
-): Promise<void> {
+export async function setSandboxGenesis(homeDir: string, config?: SandboxConfig): Promise<void> {
   // This function modifies the genesis.json file in the specified homeDir
   await overwriteGenesis(homeDir, config);
 
   const additionalAccountsWithDefault: GenesisAccount[] = [
     GenesisAccount.createDefault(),
-    ...(config?.additionalAccounts ?? [])
+    ...(config?.additionalAccounts ?? []),
   ];
   // This function create an {accountId}.json file in the homeDir for each account
   await saveAccountsKeys(homeDir, additionalAccountsWithDefault);
@@ -108,12 +114,9 @@ export async function setSandboxGenesis(
 export async function setSandboxConfig(homeDir: string, config?: SandboxConfig): Promise<void> {
   // get NEAR_SANDBOX_MAX_PAYLOAD_SIZE and NEAR_SANDBOX_MAX_OPEN_FILES from config or environment variables
   // If not provided, use default values
-  const maxPayloadSize =
-    config?.additionalGenesis?.["maxPayloadSize"] ??
-    1024 * 1024 * 1024;
+  const maxPayloadSize = config?.additionalGenesis?.['maxPayloadSize'] ?? 1024 * 1024 * 1024;
 
-  const maxOpenFiles =
-    config?.additionalGenesis?.["maxOpenFiles"] ?? 3000;
+  const maxOpenFiles = config?.additionalGenesis?.['maxOpenFiles'] ?? 3000;
 
   // create a json with these values
   let newJsonConfig: Record<string, any> = {
@@ -136,22 +139,22 @@ export async function setSandboxConfig(homeDir: string, config?: SandboxConfig):
   await overwriteSandboxConfigJson(homeDir, newJsonConfig);
 }
 
-async function overwriteGenesis(
-  homeDir: string,
-  config?: SandboxConfig
-): Promise<void> {
+async function overwriteGenesis(homeDir: string, config?: SandboxConfig): Promise<void> {
   const genesisPath = join(homeDir, 'genesis.json');
   const genesisRaw = await fs.readFile(genesisPath, 'utf-8');
   const genesisObj = JSON.parse(genesisRaw);
 
   let totalSupply = BigInt(genesisObj['total_supply']);
   if (totalSupply === null || totalSupply === undefined) {
-    throw new TypedError("Total supply not found in default genesis.json", SandboxErrors.InvalidConfig);
+    throw new TypedError(
+      'Total supply not found in default genesis.json',
+      SandboxErrors.InvalidConfig,
+    );
   }
 
   const accountsToAdd: GenesisAccount[] = [
     GenesisAccount.createDefault(),
-    ...(config?.additionalAccounts ?? [])
+    ...(config?.additionalAccounts ?? []),
   ];
 
   for (const account of accountsToAdd) {
@@ -160,7 +163,10 @@ async function overwriteGenesis(
   genesisObj['total_supply'] = totalSupply.toString();
 
   if (!Array.isArray(genesisObj['records'])) {
-    throw new TypedError("Expected 'records' to be an array in default genesis.json", SandboxErrors.InvalidConfig);
+    throw new TypedError(
+      "Expected 'records' to be an array in default genesis.json",
+      SandboxErrors.InvalidConfig,
+    );
   }
 
   for (const acc of accountsToAdd) {
@@ -169,11 +175,11 @@ async function overwriteGenesis(
         account_id: acc.accountId,
         account: {
           amount: acc.balance.toString(),
-          locked: "0",
-          code_hash: "11111111111111111111111111111111",
-          storage_usage: 182
-        }
-      }
+          locked: '0',
+          code_hash: '11111111111111111111111111111111',
+          storage_usage: 182,
+        },
+      },
     });
 
     genesisObj['records'].push({
@@ -182,9 +188,9 @@ async function overwriteGenesis(
         public_key: acc.publicKey,
         access_key: {
           nonce: 0,
-          permission: "FullAccess"
-        }
-      }
+          permission: 'FullAccess',
+        },
+      },
     });
   }
 
@@ -199,7 +205,7 @@ async function saveAccountsKeys(homeDir: string, additionalAccountsWithDefault: 
     const keyJson = {
       account_id: account.accountId,
       public_key: account.publicKey,
-      private_key: account.privateKey
+      private_key: account.privateKey,
     };
 
     const fileName = `${account.accountId}.json`;
@@ -218,4 +224,3 @@ async function overwriteSandboxConfigJson(homeDir: string, jsonConfig: Record<st
   apply(sandboxObj, jsonConfig);
   await fs.writeFile(sandboxPath, JSON.stringify(sandboxObj), 'utf-8');
 }
-

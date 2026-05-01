@@ -1,9 +1,9 @@
 export {
-    type SandboxConfig,
-    GenesisAccount,
-    DEFAULT_ACCOUNT_ID,
-    DEFAULT_PUBLIC_KEY,
-    DEFAULT_PRIVATE_KEY,
-    DEFAULT_BALANCE
+  DEFAULT_ACCOUNT_ID,
+  DEFAULT_BALANCE,
+  DEFAULT_PRIVATE_KEY,
+  DEFAULT_PUBLIC_KEY,
+  GenesisAccount,
+  type SandboxConfig,
 } from './sandbox/config';
 export * from './sandbox/Sandbox';

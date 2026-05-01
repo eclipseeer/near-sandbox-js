@@ -14,7 +14,14 @@ function ping(url) {
 }
 
 async function main() {
-  const expected = ['DEFAULT_ACCOUNT_ID', 'DEFAULT_BALANCE', 'DEFAULT_PRIVATE_KEY', 'DEFAULT_PUBLIC_KEY', 'GenesisAccount', 'Sandbox'];
+  const expected = [
+    'DEFAULT_ACCOUNT_ID',
+    'DEFAULT_BALANCE',
+    'DEFAULT_PRIVATE_KEY',
+    'DEFAULT_PUBLIC_KEY',
+    'GenesisAccount',
+    'Sandbox',
+  ];
   for (const key of expected) {
     if (!(key in sandbox)) throw new Error(`[cjs] missing export: ${key}`);
   }
@@ -32,6 +39,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('  [cjs] FAILED:', err && err.stack || err);
+  console.error('  [cjs] FAILED:', (err && err.stack) || err);
   process.exit(1);
 });

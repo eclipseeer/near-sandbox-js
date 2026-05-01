@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
-import { mkdtemp, rm, copyFile, writeFile, mkdir, readdir } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, resolve, dirname } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -10,7 +10,9 @@ const projectRoot = resolve(__dirname, '..', '..');
 function run(cmd, args, opts = {}) {
   return new Promise((res, rej) => {
     const child = spawn(cmd, args, { stdio: 'inherit', ...opts });
-    child.on('exit', (code) => (code === 0 ? res() : rej(new Error(`${cmd} ${args.join(' ')} → exit ${code}`))));
+    child.on('exit', (code) =>
+      code === 0 ? res() : rej(new Error(`${cmd} ${args.join(' ')} → exit ${code}`)),
+    );
     child.on('error', rej);
   });
 }
@@ -22,7 +24,9 @@ function runCapture(cmd, args, opts = {}) {
     let err = '';
     child.stdout.on('data', (d) => (out += d));
     child.stderr.on('data', (d) => (err += d));
-    child.on('exit', (code) => (code === 0 ? res({ out, err }) : rej(new Error(`${cmd} → exit ${code}\n${err}`))));
+    child.on('exit', (code) =>
+      code === 0 ? res({ out, err }) : rej(new Error(`${cmd} → exit ${code}\n${err}`)),
+    );
     child.on('error', rej);
   });
 }
@@ -76,7 +80,9 @@ async function main() {
     await run('pnpm', ['dlx', 'publint', projectRoot], { cwd: projectRoot });
 
     step('3/5  are-the-types-wrong');
-    await run('pnpm', ['dlx', '@arethetypeswrong/cli@latest', '--pack', projectRoot], { cwd: projectRoot });
+    await run('pnpm', ['dlx', '@arethetypeswrong/cli@latest', '--pack', projectRoot], {
+      cwd: projectRoot,
+    });
 
     step('4/5  npm pack');
     await runCapture('npm', ['pack', '--silent'], { cwd: projectRoot });
